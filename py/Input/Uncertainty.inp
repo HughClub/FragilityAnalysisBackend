@@ -1,0 +1,44 @@
+---------- LHS ----------
+[2] -- Num_S -- Number of random samples
+---------- Tower Geometry ----------
+[0, 87.6] -- TwrTH -- Tower-top height (m)
+[0, 6] -- TwrBD -- Tower-base diameter (m)
+[0, 0.027] -- TwrBT -- Tower-base thickness (m)
+[0, 3] -- TwrTD -- Tower-top diameter (m)
+[0, 0.019] -- TwrTT -- Tower-top thickness (m)
+---------- Monopile Geometry ----------
+[0, 10] -- SubTH -- Substructure-top height (m)
+[0, 20] -- WatDep -- Water depth (m)
+[0, 6] -- SubUD -- Substructure uniform diameter (m)
+[0, 0.06] -- SubUT -- Substructure uniform thickness (m)
+---------- Material ----------
+[3, 355E6, 0.05] -- MatStr -- Substructure material yielding strength (Pa)
+[0, 210E9] -- MatMod -- Substructure material elastic modulus (Pa)
+[0, 8500] -- MatDen -- Substructure material mass density (kg/m^3)
+[0, 0.3] -- MatPoR -- Substructure material poisson ratio
+---------- Rotor-nacelle Assembly ----------
+[0, 56780] -- HubMass -- Hub Mass (kg)
+[0, 240000] -- NacMass -- Nacelle Mass (kg)
+[0, 90] -- HubH -- Hub height (m)
+---------- Damping ----------
+[0, 0.477465] -- BlDR -- Blade's damping ratio (%)
+[0, 1] -- StDR -- structural-system damping ratio (%)
+---------- Wind Condition ----------
+[0, 0] -- WindSpd -- Wind speed (m/s)
+[1, -15, 15] -- WindDir -- Wind incident direction (degree)
+[0, 0.14] -- TurbC -- Turbulence characteristic
+[0, 0.04] -- Z0 -- Surface roughness length (m)
+---------- Wave Condition ----------
+[0, 4] -- WaveHs -- Input file for significant wave height (m)
+[0, 6] -- WaveTp -- Input file for wave peak period (s)
+[0, 0] -- WaveDir -- Wave incident direction (degree)
+---------- Seismic Condition (Unused currently) ----------
+[0, 0] -- SeisPGA -- Seismic PGA (g)
+[0, 0] -- SeisDir -- Seismic incident direction (degree)
+---------- END ----------
+Distribution model {0='None', 1='Uniform', 2='Normal', 3='Lognormal', 4='Weibull' distribution}
+'None' means this parameter is deterministic : Parameter = [0, Value]
+'Uniform' : Parameter = [1, Lower bound, Upper bound]
+'Normal' : Parameter = [2, Mean, CoV]
+'LogNormal' : Parameter = [3, Mean, CoV]
+'Weibull' : Parameter = [4, Shape, Scale]

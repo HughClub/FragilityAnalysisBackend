@@ -1,0 +1,28 @@
+---------- Analyze type ----------
+[1] -- AnaTy -- Analyze type {1=IDA, 2=Uncertian}
+[10] -- NumF -- Number of wind-wave fields for each hazrad intensity
+---------- IDA Setting ---------- [Used only when AnaTy=1]
+[1] -- IMImpM -- Intensity measure input method {1=arithmetic series, 2=user define}
+[10, 15, 1] -- WindSpd -- Wind speed at hub height (m/s), Parameter = [Cut-in ,Cut-out, Step] when IMImp=1, and input file when IMImp=2
+[2] -- WPInpM -- Wave parameters input method {1=still water, 2=using wind-wave correlation, 3=user-defined file}
+[] -- WaveHsF -- Input file for significant wave height (m) [used only when WPInpM=3]
+[] -- WaveTpF -- Input file for wave peak period (s) [used only when WPInp=3]
+---------- Oprational Condition ----------
+[2] -- OM -- Operational mode {1='Normal operating', 2='Parked', 3='Start up', 4='Idling', 5'='Normal shutdown', 6='Emergency shutdown'}
+[] -- ShutT -- Time to shutdown [used only when OM = 5 and 6]
+---------- Simulation Setting ----------
+[10] -- SimT -- Simulation time (s)
+[0.005] -- DT -- Time step for simulation in OpenFAST (s)
+[1] -- BldSimM -- Blade simulation method {1=ElastoDyn, 2=BeamDyn}
+---------- Wind Condition ----------
+['IECKAI'] -- TurbModel -- Turbulence model {'IECKAI','IECVKM','GP_LLJ','NWTCUP','SMOOTH','WF_UPW','WF_07D','WF_14D','TIDAL','API','USRINP','TIMESR'}
+['NTM'] -- IEC_WindType -- IEC turbulence type {'NTM'=normal, 'xETM'=extreme turbulence x = 1, 2, 3}
+['PL'] -- WindProfileType -- Velocity profile type {'LOG','PL'=power law,'JET','H2L'=Log law for TIDAL model,'API','USR','TS'}
+['default'] -- PLExp -- Power law exponent [-] (or "default")
+[1] -- WakeMod -- Type of wake/induction model (switch) {0=none, 1=BEMT, 2=DBEMT}
+---------- OpenSees Seeting ----------
+["ALL"] -- IM_Model -- Model selected to perform Analyses in OpenSees {[1,2,3...] or ["ALL"] or ["None"]}
+[1] -- IM_Nth -- Nth number of IM starting to perform IDA in OpenSees [Used only when AnaTy=1]
+[0.01] -- DampR -- Damping ratio of structure
+[0.05] -- dT -- Time step for simulation in OpenSees (s)
+---------- END ----------

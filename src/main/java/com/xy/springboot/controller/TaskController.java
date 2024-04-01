@@ -2,6 +2,7 @@ package com.xy.springboot.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xy.springboot.common.BaseResponse;
+import com.xy.springboot.common.DeleteRequest;
 import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.common.ResultUtils;
 import com.xy.springboot.exception.BusinessException;
@@ -30,7 +31,7 @@ import java.util.List;
 public class TaskController {
 
     @Value("${file.upload.url}")
-    private  String fileUploadUrl;
+    private String fileUploadUrl;
 
     @Resource
     private TaskService taskService;
@@ -42,21 +43,29 @@ public class TaskController {
      * 创建新任务
      */
     @PostMapping("/add")
-    public BaseResponse<Long> addTask(@RequestPart("files")MultipartFile[] files, HttpServletRequest request) {
+    public BaseResponse<Long> addTask(@RequestPart("files") MultipartFile[] files, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Long taskId = taskService.taskCreate(loginUser.getId());
+        // 1. 根据任务创建任务目录，下有两个目录，input 目录存放输入文件，output目录存放输出文件（这里只创建出来）
+        File inputDir = new File(fileUploadUrl + taskId + "/input");
+        File outputDir = new File(fileUploadUrl + taskId + "/output");
+        if (!inputDir.exists()) {
+            inputDir.mkdirs();
+        }
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
+        // 2. 保存文件
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();  // 文件名
-            File dest = new File(fileUploadUrl + fileName);
-            if (!dest.getParentFile().exists()) {
-                dest.getParentFile().mkdirs();
-            }
+            File dest = new File(fileUploadUrl + taskId + "/input/" + fileName);
             try {
                 file.transferTo(dest);
             } catch (Exception e) {
-                log.error("文件上传失败", e);
-                throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//                log.error("文件上传失败", e);
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "文件上传失败");
             }
+            log.info("文件上传成功，保存到：{}", dest.getAbsolutePath());
         }
         return ResultUtils.success(taskId);
     }
@@ -64,13 +73,13 @@ public class TaskController {
     /**
      * 删除任务
      *
-     * @param taskId 任务 id
+     * @param deleteRequest 删除请求
      * @param request 请求
      * @return
      */
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteTask(@RequestParam Long taskId, HttpServletRequest request) {
-        boolean result = taskService.taskDelete(taskId, request);
+    public BaseResponse<Boolean> deleteTask(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        boolean result = taskService.taskDelete(deleteRequest, request);
         return ResultUtils.success(result);
     }
 
@@ -78,11 +87,13 @@ public class TaskController {
      * 多条件查询任务
      *
      * @param taskQueryRequest 任务查询请求
+     * @param request          请求
      * @return
      */
     @PostMapping("/query")
-    public BaseResponse<List<Task>> queryTask(@RequestBody TaskQueryRequest taskQueryRequest) {
-        QueryWrapper<Task> queryWrapper = taskService.getTaskQueryWrapper(taskQueryRequest);
+    public BaseResponse<List<Task>> queryTask(@RequestBody TaskQueryRequest taskQueryRequest,
+                                              HttpServletRequest request) {
+        QueryWrapper<Task> queryWrapper = taskService.getTaskQueryWrapper(taskQueryRequest, request);
         List<Task> taskList = taskService.list(queryWrapper);
         return ResultUtils.success(taskList);
     }

@@ -8,15 +8,6 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 public class TaskQueryRequest {
-    /**
-     * 任务 id
-     */
-    private Long taskId;
-
-    /**
-     * 用户 id
-     */
-    private Long userId;
 
     /**
      * 任务状态

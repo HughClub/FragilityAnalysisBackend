@@ -3,6 +3,7 @@ package com.xy.springboot.service.impl;
 import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xy.springboot.common.DeleteRequest;
 import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.exception.BusinessException;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
@@ -11,9 +12,12 @@ import com.xy.springboot.mapper.TaskMapper;
 import com.xy.springboot.model.entity.User;
 import com.xy.springboot.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 import static com.xy.springboot.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -55,7 +59,8 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
     }
 
     @Override
-    public boolean taskDelete(Long taskId, HttpServletRequest request) {
+    public boolean taskDelete(DeleteRequest deleteRequest, HttpServletRequest request) {
+        Long taskId = deleteRequest.getId();
         // 1.任务是否存在
         Task task = this.getById(taskId);
         if (task == null) {
@@ -63,7 +68,11 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "任务不存在");
         }
         // 2.用户是否有权删除任务
-        User user = (User) request.getAttribute(USER_LOGIN_STATE);
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (user == null) {
+            log.info("用户未登录");
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
+        }
         if (!task.getUserId().equals(user.getId())) {
             log.info("用户 {} 无权删除任务 {}", user.getId(), taskId);
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权删除任务");
@@ -78,20 +87,25 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
     }
 
     @Override
-    public QueryWrapper<Task> getTaskQueryWrapper(TaskQueryRequest taskQueryRequest) {
+    public QueryWrapper<Task> getTaskQueryWrapper(TaskQueryRequest taskQueryRequest, HttpServletRequest request) {
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         if (taskQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
-        if (taskQueryRequest.getTaskId() != null) {
-            queryWrapper.eq("id", taskQueryRequest.getTaskId());
+        String taskStatus = taskQueryRequest.getTaskStatus();
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
-        if (taskQueryRequest.getUserId() != null) {
-            queryWrapper.eq("user_id", taskQueryRequest.getUserId());
-        }
-        if (taskQueryRequest.getTaskStatus() != null) {
-            queryWrapper.eq("task_status", taskQueryRequest.getTaskStatus());
-        }
+        queryWrapper.eq("userId", user.getId())
+                .eq(StringUtils.isNotBlank(taskStatus), "taskStatus", taskStatus);
         return queryWrapper;
+    }
+
+    @Override
+    public List<Task> listUnfinishedTask() {
+        QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("taskStatus", "todo");
+        return this.list(queryWrapper);
     }
 }

@@ -25,7 +25,7 @@ public class Task implements Serializable {
     private Long userId;
 
     /**
-     * 任务状态：todo/done/failed
+     * 任务状态：todo/running/done/failed
      */
     private String taskStatus;
 

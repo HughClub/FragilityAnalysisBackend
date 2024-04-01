@@ -9,6 +9,7 @@ import com.xy.springboot.exception.BusinessException;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.model.entity.User;
+import com.xy.springboot.model.vo.TaskVO;
 import com.xy.springboot.service.TaskService;
 import com.xy.springboot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -91,10 +92,10 @@ public class TaskController {
      * @return
      */
     @PostMapping("/query")
-    public BaseResponse<List<Task>> queryTask(@RequestBody TaskQueryRequest taskQueryRequest,
-                                              HttpServletRequest request) {
+    public BaseResponse<List<TaskVO>> queryTask(@RequestBody TaskQueryRequest taskQueryRequest,
+                                                HttpServletRequest request) {
         QueryWrapper<Task> queryWrapper = taskService.getTaskQueryWrapper(taskQueryRequest, request);
         List<Task> taskList = taskService.list(queryWrapper);
-        return ResultUtils.success(taskList);
+        return ResultUtils.success(taskService.convertTaskVOList(taskList));
     }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xy.springboot.common.DeleteRequest;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
 import com.xy.springboot.model.entity.Task;
+import com.xy.springboot.model.vo.TaskVO;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -38,6 +39,22 @@ public interface TaskService extends IService<Task> {
      * @return
      */
     boolean taskDelete(DeleteRequest deleteRequest, HttpServletRequest request);
+
+    /**
+     * 任务视图转化
+     *
+     * @param task 任务
+     * @return
+     */
+    public TaskVO convertTaskVO(Task task);
+
+    /**
+     * 列表任务视图转化
+     *
+     * @param tasks 任务列表
+     * @return
+     */
+    public List<TaskVO> convertTaskVOList(List<Task> tasks);
 
     /**
      * 获取任务查询条件

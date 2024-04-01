@@ -23,7 +23,7 @@ create table if not exists task
 (
     id          bigint auto_increment comment 'id' primary key,
     userId      bigint                                 not null comment '用户id',
-    taskStatus  varchar(256) default 'todo'            not null comment '任务状态：todo/done/failed',
+    taskStatus  varchar(256) default 'todo'            not null comment '任务状态：todo/running/done/failed',
     createTime  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime  datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete    tinyint      default 0                 not null comment '是否删除',

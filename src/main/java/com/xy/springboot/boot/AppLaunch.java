@@ -77,6 +77,8 @@ public class AppLaunch implements Launch {
         @Override
         public void run() {
             // 任务执行逻辑
+            // 占据任务
+            taskService.taskUpdate(taskId, "running");
             // 执行Python程序
 //            python C:\Users\XY\Desktop\ysxfx\Codes\Main.py --Path_Inp C:/Users/XY/Desktop/ysxfx/Input
 //            --Path_FAST C:/Users/XY/Desktop/ysxfx/OpenFAST --Paht_Out C:\Users\XY\Desktop\output1
@@ -109,7 +111,7 @@ public class AppLaunch implements Launch {
                         taskService.taskUpdate(taskId, "failed");
                     } else {
                         log.info("Task {} finished successfully", taskId);
-                        taskService.taskUpdate(taskId, "finished");
+                        taskService.taskUpdate(taskId, "done");
                     }
                     break;
                 } catch (IllegalThreadStateException e) {

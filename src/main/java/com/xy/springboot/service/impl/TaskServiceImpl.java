@@ -10,14 +10,18 @@ import com.xy.springboot.model.dto.task.TaskQueryRequest;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.mapper.TaskMapper;
 import com.xy.springboot.model.entity.User;
+import com.xy.springboot.model.vo.TaskVO;
 import com.xy.springboot.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.xy.springboot.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -87,6 +91,24 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
     }
 
     @Override
+    public TaskVO convertTaskVO(Task task) {
+        if (task == null) {
+            return null;
+        }
+        TaskVO taskVO = new TaskVO();
+        BeanUtils.copyProperties(task, taskVO);
+        return taskVO;
+    }
+
+    @Override
+    public List<TaskVO> convertTaskVOList(List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return tasks.stream().map(this::convertTaskVO).collect(Collectors.toList());
+    }
+
+    @Override
     public QueryWrapper<Task> getTaskQueryWrapper(TaskQueryRequest taskQueryRequest, HttpServletRequest request) {
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         if (taskQueryRequest == null) {
@@ -106,6 +128,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
     public List<Task> listUnfinishedTask() {
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("taskStatus", "todo");
+        queryWrapper.last("limit 5");
         return this.list(queryWrapper);
     }
 }

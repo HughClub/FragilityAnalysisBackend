@@ -77,7 +77,7 @@ public class TaskController {
     /**
      * 用参数创建新任务
      */
-    @PostMapping("/add")
+    @PostMapping("/create")
     public BaseResponse<Long> addTask(@RequestBody AnalyzeConfig config, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Long taskId = taskService.taskCreate(loginUser.getId());

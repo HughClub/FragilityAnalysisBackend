@@ -102,7 +102,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
 
     @Override
     public List<TaskVO> convertTaskVOList(List<Task> tasks) {
-        if (tasks.isEmpty()) {
+        if (tasks == null || tasks.isEmpty()) {
             return new ArrayList<>();
         }
         return tasks.stream().map(this::convertTaskVO).collect(Collectors.toList());

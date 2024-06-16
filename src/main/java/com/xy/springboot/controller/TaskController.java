@@ -7,11 +7,13 @@ import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.common.ResultUtils;
 import com.xy.springboot.exception.BusinessException;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
+import com.xy.springboot.model.entity.AnalyzeConfig;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.model.entity.User;
 import com.xy.springboot.model.vo.TaskVO;
 import com.xy.springboot.service.TaskService;
 import com.xy.springboot.service.UserService;
+import com.xy.springboot.utils.ConfigUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -70,6 +73,32 @@ public class TaskController {
         }
         return ResultUtils.success(taskId);
     }
+
+    /**
+     * 用参数创建新任务
+     */
+    @PostMapping("/add")
+    public BaseResponse<Long> addTask(@RequestBody AnalyzeConfig config, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        Long taskId = taskService.taskCreate(loginUser.getId());
+        // 1. 根据任务创建任务目录，下有两个目录，input 目录存放输入文件，output目录存放输出文件（这里只创建出来）
+        File inputDir = new File(fileUploadUrl + taskId + "/input");
+        File outputDir = new File(fileUploadUrl + taskId + "/output");
+        if (!inputDir.exists()) {
+            inputDir.mkdirs();
+        }
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
+        // 2. 保存文件
+        try {
+            ConfigUtils.generateConfigFile(taskId, config);
+        } catch (IOException e) {
+            return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "文件上传失败");
+        }
+        return ResultUtils.success(taskId);
+    }
+
 
     /**
      * 删除任务

@@ -97,6 +97,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         }
         TaskVO taskVO = new TaskVO();
         BeanUtils.copyProperties(task, taskVO);
+        taskVO.setTaskId(task.getId());
         return taskVO;
     }
 

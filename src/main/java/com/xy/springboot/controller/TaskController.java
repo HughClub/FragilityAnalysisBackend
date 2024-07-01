@@ -7,7 +7,7 @@ import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.common.ResultUtils;
 import com.xy.springboot.exception.BusinessException;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
-import com.xy.springboot.model.entity.AnalyzeConfig;
+import com.xy.springboot.model.entity.Uncertainty;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.model.entity.User;
 import com.xy.springboot.model.vo.TaskVO;
@@ -78,7 +78,7 @@ public class TaskController {
      * 用参数创建新任务
      */
     @PostMapping("/create")
-    public BaseResponse<Long> addTask(@RequestBody AnalyzeConfig config, HttpServletRequest request) {
+    public BaseResponse<Long> addTask(@RequestBody Uncertainty config, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         Long taskId = taskService.taskCreate(loginUser.getId());
         // 1. 根据任务创建任务目录，下有两个目录，input 目录存放输入文件，output目录存放输出文件（这里只创建出来）

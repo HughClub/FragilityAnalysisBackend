@@ -6,7 +6,7 @@ import com.xy.springboot.model.entity.Task;
 /**
  * 任务数据库操作
 */
-public interface TaskMapper extends BaseMapper<Task> {
+public interface  TaskMapper extends BaseMapper<Task> {
 
 
 }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.springboot.mapper.ConditionMapper">
+
+    <resultMap id="BaseResultMap" type="com.xy.springboot.model.entity.Condition">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="taskId" column="taskId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="anaTy" column="AnaTy" jdbcType="VARCHAR"/>
+            <result property="numF" column="NumF" jdbcType="VARCHAR"/>
+            <result property="IMImpM" column="IMImpM" jdbcType="VARCHAR"/>
+            <result property="windSpd" column="WindSpd" jdbcType="VARCHAR"/>
+            <result property="WPInpM" column="WPInpM" jdbcType="VARCHAR"/>
+            <result property="waveHsF" column="WaveHsF" jdbcType="VARCHAR"/>
+            <result property="waveTpF" column="WaveTpF" jdbcType="VARCHAR"/>
+            <result property="OM" column="OM" jdbcType="VARCHAR"/>
+            <result property="shutT" column="ShutT" jdbcType="VARCHAR"/>
+            <result property="simT" column="SimT" jdbcType="VARCHAR"/>
+            <result property="openFastDT" column="OpenFastDT" jdbcType="VARCHAR"/>
+            <result property="bldSimM" column="BldSimM" jdbcType="VARCHAR"/>
+            <result property="turbModel" column="TurbModel" jdbcType="VARCHAR"/>
+            <result property="IEC_WindType" column="IEC_WindType" jdbcType="VARCHAR"/>
+            <result property="windProfileType" column="WindProfileType" jdbcType="VARCHAR"/>
+            <result property="PLExp" column="PLExp" jdbcType="VARCHAR"/>
+            <result property="wakeMod" column="WakeMod" jdbcType="VARCHAR"/>
+            <result property="IM_Model" column="IM_Model" jdbcType="VARCHAR"/>
+            <result property="IM_Nth" column="IM_Nth" jdbcType="VARCHAR"/>
+            <result property="dampR" column="DampR" jdbcType="VARCHAR"/>
+            <result property="openSeesDt" column="OpenSeesDt" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,taskId,createTime,
+        updateTime,isDelete,AnaTy,
+        NumF,IMImpM,WindSpd,
+        WPInpM,WaveHsF,WaveTpF,
+        OM,ShutT,SimT,
+        OpenFastDT,BldSimM,TurbModel,
+        IEC_WindType,WindProfileType,PLExp,
+        WakeMod,IM_Model,IM_Nth,
+        DampR,OpenSeesDt
+    </sql>
+</mapper>

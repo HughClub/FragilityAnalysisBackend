@@ -1,6 +1,5 @@
 package com.xy.springboot.service.impl;
 
-import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xy.springboot.common.DeleteRequest;
@@ -52,7 +51,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         // 1. 更新任务
         Task task = new Task();
         task.setId(taskId);
-        task.setTaskStatus(taskStatus);
+        task.setCurStatus(taskStatus);
         boolean result = this.updateById(task);
         if (!result) {
             log.info("任务 {} 更新失败", taskId);

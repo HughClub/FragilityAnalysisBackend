@@ -20,17 +20,9 @@ import javax.annotation.Resource;
 @MapperScan("com.xy.springboot.mapper")
 @EnableScheduling
 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
-public class MainApplication implements CommandLineRunner{
-    @Resource
-    private Launch launch;
-
+public class MainApplication {
     public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);
-    }
-
-    @Override
-    public void run(String[] args) {
-        launch.start();
     }
 
 }

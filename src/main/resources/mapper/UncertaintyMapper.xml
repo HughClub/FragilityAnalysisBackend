@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.UncertaintyMapper">
+
+    <resultMap id="BaseResultMap" type="com.xy.springboot.model.entity.Uncertainty">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="taskId" column="taskId" jdbcType="BIGINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="num_S" column="Num_S" jdbcType="VARCHAR"/>
+            <result property="twrTH" column="TwrTH" jdbcType="VARCHAR"/>
+            <result property="twrBD" column="TwrBD" jdbcType="VARCHAR"/>
+            <result property="twrBT" column="TwrBT" jdbcType="VARCHAR"/>
+            <result property="twrTD" column="TwrTD" jdbcType="VARCHAR"/>
+            <result property="twrTT" column="TwrTT" jdbcType="VARCHAR"/>
+            <result property="subTH" column="SubTH" jdbcType="VARCHAR"/>
+            <result property="watDep" column="WatDep" jdbcType="VARCHAR"/>
+            <result property="subUD" column="SubUD" jdbcType="VARCHAR"/>
+            <result property="subUT" column="SubUT" jdbcType="VARCHAR"/>
+            <result property="matStrMean" column="MatStrMean" jdbcType="VARCHAR"/>
+            <result property="matStrVariance" column="MatStrVariance" jdbcType="VARCHAR"/>
+            <result property="matMod" column="MatMod" jdbcType="VARCHAR"/>
+            <result property="matDen" column="MatDen" jdbcType="VARCHAR"/>
+            <result property="matPoR" column="MatPoR" jdbcType="VARCHAR"/>
+            <result property="hubMass" column="HubMass" jdbcType="VARCHAR"/>
+            <result property="nacMass" column="NacMass" jdbcType="VARCHAR"/>
+            <result property="hubH" column="HubH" jdbcType="VARCHAR"/>
+            <result property="blDR" column="BlDR" jdbcType="VARCHAR"/>
+            <result property="stDR" column="StDR" jdbcType="VARCHAR"/>
+            <result property="windSpd" column="WindSpd" jdbcType="VARCHAR"/>
+            <result property="windDirMin" column="WindDirMin" jdbcType="VARCHAR"/>
+            <result property="windDirMax" column="WindDirMax" jdbcType="VARCHAR"/>
+            <result property="turbC" column="TurbC" jdbcType="VARCHAR"/>
+            <result property="z0" column="Z0" jdbcType="VARCHAR"/>
+            <result property="waveHs" column="WaveHs" jdbcType="VARCHAR"/>
+            <result property="waveTp" column="WaveTp" jdbcType="VARCHAR"/>
+            <result property="waveDir" column="WaveDir" jdbcType="VARCHAR"/>
+            <result property="seisPGA" column="SeisPGA" jdbcType="VARCHAR"/>
+            <result property="seisDir" column="SeisDir" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,taskId,createTime,
+        updateTime,isDelete,Num_S,
+        TwrTH,TwrBD,TwrBT,
+        TwrTD,TwrTT,SubTH,
+        WatDep,SubUD,SubUT,
+        MatStrMean,MatStrVariance,MatMod,
+        MatDen,MatPoR,HubMass,
+        NacMass,HubH,BlDR,
+        StDR,WindSpd,WindDirMin,
+        WindDirMax,TurbC,Z0,
+        WaveHs,WaveTp,WaveDir,
+        SeisPGA,SeisDir
+    </sql>
+</mapper>

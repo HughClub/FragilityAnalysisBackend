@@ -1,6 +1,6 @@
 package com.xy.springboot.utils;
 
-import com.xy.springboot.model.entity.AnalyzeConfig;
+import com.xy.springboot.model.entity.Uncertainty;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,7 +16,7 @@ public class ConfigUtils {
      * @param taskId
      * @param config
      */
-    public static void generateConfigFile(Long taskId, AnalyzeConfig config) throws IOException {
+    public static void generateConfigFile(Long taskId, Uncertainty config) throws IOException {
         File inputDir = new File(getInputDir(taskId));
         if (!inputDir.exists()) {
             inputDir.mkdirs();
@@ -42,7 +42,7 @@ public class ConfigUtils {
     }
 
     public static void main(String[] args) {
-        AnalyzeConfig config = new AnalyzeConfig();
+        Uncertainty config = new Uncertainty();
         config.setNum_S("100");
         config.setTwrTH("0");
         config.setTwrBD("0");
@@ -53,7 +53,8 @@ public class ConfigUtils {
         config.setWatDep("0");
         config.setSubUD("0");
         config.setSubUT("0");
-        config.setMatStr(new AnalyzeConfig.NormalDistribution("3", "25"));
+        config.setMatStrMean("3");
+        config.setMatStrVariance("25");
         config.setMatMod("0");
         config.setMatDen("0");
         config.setMatPoR("0");
@@ -63,7 +64,8 @@ public class ConfigUtils {
         config.setBlDR("0");
         config.setStDR("0");
         config.setWindSpd("0");
-        config.setWindDir(new AnalyzeConfig.UniformDistribution("1", "2"));
+        config.setWindDirMin("1");
+        config.setWindDirMax("1");
         config.setTurbC("0");
         config.setZ0("0");
         config.setWaveHs("0");
@@ -79,7 +81,7 @@ public class ConfigUtils {
         }
     }
 
-    public static String generateUncertaintyFileContent(AnalyzeConfig config) {
+    public static String generateUncertaintyFileContent(Uncertainty config) {
         StringBuilder content = new StringBuilder();
 
         // 添加文件头部
@@ -103,7 +105,7 @@ public class ConfigUtils {
 
         // 添加材料参数
         content.append("---------- Material ----------\n")
-                .append("[3, " + config.getMatStr().getMean() + ", " + config.getMatStr().getVariance() + "] -- MatStr -- Substructure material yielding strength (Pa)\n")
+                .append("[3, " + config.getMatStrMean() + ", " + config.getMatStrVariance() + "] -- MatStr -- Substructure material yielding strength (Pa)\n")
                 .append("[0, " + config.getMatMod() + "] -- MatMod -- Substructure material elastic modulus (Pa)\n")
                 .append("[0, " + config.getMatDen() + "] -- MatDen -- Substructure material mass density (kg/m^3)\n")
                 .append("[0, " + config.getMatPoR() + "] -- MatPoR -- Substructure material poisson ratio\n");
@@ -122,7 +124,7 @@ public class ConfigUtils {
         // 添加风况参数
         content.append("---------- Wind Condition ----------\n")
                 .append("[0, " + config.getWindSpd() + "] -- WindSpd -- Wind speed (m/s)\n")
-                .append("[1, " + config.getWindDir().getMin() + ", " + config.getWindDir().getMax() + "] -- WindDir -- Wind incident direction (degree)\n")
+                .append("[1, " + config.getWindDirMin() + ", " + config.getWindDirMax() + "] -- WindDir -- Wind incident direction (degree)\n")
                 .append("[0, " + config.getTurbC() + "] -- TurbC -- Turbulence characteristic\n")
                 .append("[0, " + config.getZ0() + "] -- Z0 -- Surface roughness length (m)\n");
 

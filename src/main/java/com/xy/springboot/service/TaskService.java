@@ -3,6 +3,7 @@ package com.xy.springboot.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xy.springboot.common.DeleteRequest;
+import com.xy.springboot.model.dto.task.TaskCreateRequest;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.model.vo.TaskVO;
@@ -17,10 +18,11 @@ public interface TaskService extends IService<Task> {
     /**
      * 任务创建
      *
-     * @param userId 用户 id
+     * @param request           用户 id
+     * @param taskCreateRequest
      * @return 新任务 id
      */
-    Long taskCreate(Long userId);
+    Long taskCreate(HttpServletRequest request, TaskCreateRequest taskCreateRequest);
 
     /**
      * 任务更新

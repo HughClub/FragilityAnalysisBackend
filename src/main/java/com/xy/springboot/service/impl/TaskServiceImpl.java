@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xy.springboot.common.DeleteRequest;
 import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.exception.BusinessException;
+import com.xy.springboot.model.dto.task.TaskCreateRequest;
 import com.xy.springboot.model.dto.task.TaskQueryRequest;
 import com.xy.springboot.model.entity.Task;
 import com.xy.springboot.mapper.TaskMapper;
@@ -33,16 +34,22 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         implements TaskService {
 
     @Override
-    public Long taskCreate(Long userId) {
-        // 1. 创建任务
+    public Long taskCreate(HttpServletRequest request, TaskCreateRequest taskCreateRequest) {
+        // 1. 用户是否登录
+        User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (user == null) {
+            log.info("用户未登录");
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
+        }
         Task task = new Task();
-        task.setUserId(userId);
+        task.setUserId(user.getId());
+        task.setTaskName(taskCreateRequest.getTaskName());
         boolean result = this.save(task);
         if (!result) {
-            log.info("用户 {} 创建任务失败", userId);
+            log.info("用户 {} 创建任务失败", request);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "创建任务失败");
         }
-        log.info("用户 {} 创建任务 {}", userId, task.getId());
+        log.info("用户 {} 创建任务 {}", request, task.getId());
         return task.getId();
     }
 
@@ -114,13 +121,15 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         if (taskQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
-        String taskStatus = taskQueryRequest.getTaskStatus();
         User user = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
+        String taskStatus = taskQueryRequest.getTaskStatus();
+        String taskName = taskQueryRequest.getTaskName();
         queryWrapper.eq("userId", user.getId())
-                .eq(StringUtils.isNotBlank(taskStatus), "taskStatus", taskStatus);
+                .eq(StringUtils.isNotBlank(taskStatus), "taskStatus", taskStatus)
+                .eq(StringUtils.isNotBlank(taskName), "taskName", taskName);
         return queryWrapper;
     }
 

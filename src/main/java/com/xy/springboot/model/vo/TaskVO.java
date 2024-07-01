@@ -16,11 +16,6 @@ public class TaskVO implements Serializable {
     private Long taskId;
 
     /**
-     * 用户 id
-     */
-    private Long userId;
-
-    /**
      * 任务状态
      */
     private String taskStatus;

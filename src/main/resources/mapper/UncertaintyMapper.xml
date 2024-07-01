@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="generator.mapper.UncertaintyMapper">
+<mapper namespace="com.xy.springboot.mapper.UncertaintyMapper">
 
     <resultMap id="BaseResultMap" type="com.xy.springboot.model.entity.Uncertainty">
             <id property="id" column="id" jdbcType="BIGINT"/>

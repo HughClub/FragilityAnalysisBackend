@@ -9,5 +9,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-07-01 21:59:18
 */
 public interface ConditionService extends IService<Condition> {
-
+    /**
+     * 创建或更新Condition
+     *
+     * @param condition Condition
+     * @return Condition
+     */
+    int createOrUpdateCondition(Condition condition);
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +42,16 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
             log.info("用户未登录");
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
+        // 2. 查询之前是否有同名任务
+        QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", user.getId())
+                .eq("taskName", taskCreateRequest.getTaskName());
+        Task taskExist = this.getOne(queryWrapper);
+        if (taskExist != null) {
+            log.info("用户 {} 创建任务失败，任务 {} 已存在", user.getId(), taskCreateRequest.getTaskName());
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务已存在");
+        }
+        // 3. 创建任务
         Task task = new Task();
         task.setUserId(user.getId());
         task.setTaskName(taskCreateRequest.getTaskName());

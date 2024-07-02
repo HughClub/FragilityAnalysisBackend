@@ -19,5 +19,6 @@ public class TaskQueryRequest implements Serializable {
      * 任务名称
      */
     private String taskName;
+
     private static final long serialVersionUID = 1L;
 }

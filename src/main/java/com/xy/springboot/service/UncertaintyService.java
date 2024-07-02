@@ -9,5 +9,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-06-30 17:49:43
 */
 public interface UncertaintyService extends IService<Uncertainty> {
-
+    /**
+     * 插入或更新
+     * @param uncertainty 不确定性
+     * @return 插入或更新结果
+     */
+    int createOrUpdateUncertainty(Uncertainty uncertainty);
 }

@@ -16,9 +16,14 @@ public class TaskVO implements Serializable {
     private Long taskId;
 
     /**
-     * 任务状态
+     * 当前阶段
      */
-    private String taskStatus;
+    private int curStage;
+
+    /**
+     * 当前状态
+     */
+    private String curStatus;
 
     /**
      * 任务创建时间

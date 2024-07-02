@@ -114,6 +114,13 @@ public class TaskController {
         return ResultUtils.success("success");
     }
 
+    /**
+     * 创建 or 更新 Vulnerability 任务配置
+     * @param vulnerabilityCreateOrUpdateRequest vulnerabilityCreateOrUpdateRequest
+     * @param request request
+     * @return BaseResponse
+     */
+    @PostMapping("/config/Vulnerability")
     public BaseResponse<String> configVulnerability(@RequestBody VulnerabilityCreateOrUpdateRequest vulnerabilityCreateOrUpdateRequest,
                                                 HttpServletRequest request) {
         Long taskId = vulnerabilityCreateOrUpdateRequest.getTaskId();

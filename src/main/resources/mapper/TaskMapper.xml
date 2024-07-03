@@ -10,6 +10,7 @@
             <result property="taskName" column="taskName" jdbcType="VARCHAR"/>
             <result property="curStage" column="curStage" jdbcType="INTEGER"/>
             <result property="curStatus" column="curStatus" jdbcType="VARCHAR"/>
+            <result property="config" column="config" jdbcType="INTEGER"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
@@ -17,7 +18,7 @@
 
     <sql id="Base_Column_List">
         id,userId,taskName,
-        curStage,curStatus,createTime,
-        updateTime,isDelete
+        curStage,curStatus,config,
+        createTime,updateTime,isDelete
     </sql>
 </mapper>

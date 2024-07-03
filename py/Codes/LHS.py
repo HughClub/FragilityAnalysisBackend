@@ -4,11 +4,12 @@
 import numpy as np
 import pandas as pd
 from pyDOE import lhs
+import os
 from scipy.stats import norm, lognorm, weibull_min
 from ReadInpFiles import ReadInpFile
 
 
-def LHS(Path_Inp):
+def LHS(Path_Inp, Path_Out):
     Dict_Unc = ReadInpFile(Path_Inp + '/Uncertainty.inp')
     # ---------- LHS Sampling ----------
     Num_S = Dict_Unc['Num_S'][0]
@@ -17,7 +18,10 @@ def LHS(Path_Inp):
         LHS_Samples[:, i] = Sampling(list(Dict_Unc.values())[i+1], Num_S)
     DF_Samp = pd.DataFrame(LHS_Samples, columns=list(Dict_Unc.keys())[1:])
 
-    with pd.ExcelWriter((Path_Inp + '/LHS_Samples.xlsx')) as writer:
+    # ---------- Write to Excel ----------
+    if not os.path.exists(Path_Out):
+        os.makedirs(Path_Out)
+    with pd.ExcelWriter((Path_Out + '/LHS_Samples.xlsx')) as writer:
         DF_Samp.to_excel(writer, sheet_name='Models', index=False)
 
 

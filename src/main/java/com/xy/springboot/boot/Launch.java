@@ -1,15 +1,8 @@
 package com.xy.springboot.boot;
 
 public interface Launch {
-    /**
-     * Start the server.
-     */
-    int start();
 
-    /**
-     * Destroy the server.
-     */
-    int destroy();
+    void terminatePythonTask(Long taskId);
 
-    int init();
+    void executePythonTask(Long taskId, Integer taskStage);
 }

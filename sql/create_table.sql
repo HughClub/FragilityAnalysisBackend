@@ -26,6 +26,7 @@ create table if not exists task
     taskName   varchar(256) unique                    not null comment '任务名称',
     curStage   int          default 0                 not null comment '任务阶段',
     curStatus  varchar(256) default 'todo'            not null comment '当前阶段任务状态：todo/running/done/failed',
+    config     int          default 0                 not null comment '配置文件',
     createTime datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete   tinyint      default 0                 not null comment '是否删除',

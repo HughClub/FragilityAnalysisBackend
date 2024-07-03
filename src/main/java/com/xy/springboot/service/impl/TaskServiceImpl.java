@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.xy.springboot.constant.UserConstant.USER_LOGIN_STATE;
@@ -136,11 +137,13 @@ public class TaskServiceImpl extends ServiceImpl<TaskMapper, Task>
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
-        String taskStatus = taskQueryRequest.getTaskStatus();
+        Long taskId = taskQueryRequest.getTaskId();
+        String curStatus = taskQueryRequest.getCurStatus();
         String taskName = taskQueryRequest.getTaskName();
         queryWrapper.eq("userId", user.getId())
-                .eq(StringUtils.isNotBlank(taskStatus), "taskStatus", taskStatus)
-                .eq(StringUtils.isNotBlank(taskName), "taskName", taskName);
+                .eq(StringUtils.isNotBlank(curStatus), "taskStatus", curStatus)
+                .eq(StringUtils.isNotBlank(taskName), "taskName", taskName)
+                .eq(Objects.nonNull(taskId), "id", taskId);
         return queryWrapper;
     }
 

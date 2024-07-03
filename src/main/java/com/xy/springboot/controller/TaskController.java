@@ -1,19 +1,21 @@
 package com.xy.springboot.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.xy.springboot.boot.Launch;
 import com.xy.springboot.common.BaseResponse;
 import com.xy.springboot.common.DeleteRequest;
 import com.xy.springboot.common.ErrorCode;
 import com.xy.springboot.common.ResultUtils;
 import com.xy.springboot.exception.BusinessException;
-import com.xy.springboot.model.dto.task.TaskCreateRequest;
-import com.xy.springboot.model.dto.task.TaskQueryRequest;
+import com.xy.springboot.model.dto.task.*;
 import com.xy.springboot.model.dto.task.config.ConditionCreateOrUpdateRequest;
 import com.xy.springboot.model.dto.task.config.UncertaintyCreateOrUpdateRequest;
 import com.xy.springboot.model.dto.task.config.VulnerabilityCreateOrUpdateRequest;
 import com.xy.springboot.model.entity.*;
 import com.xy.springboot.model.vo.TaskVO;
 import com.xy.springboot.service.*;
+import com.xy.springboot.utils.FolderToZipUtil;
+import com.xy.springboot.utils.TaskUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -50,6 +53,9 @@ public class TaskController {
     @Resource
     private VulnerabilityService vulnerabilityService;
 
+    @Resource
+    private Launch launch;
+
     /**
      * 创建新任务
      */
@@ -70,9 +76,10 @@ public class TaskController {
                                                   HttpServletRequest request) {
         Long taskId = uncertaintyCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
-        Task task = checkLoginAuth(taskId, user);
+        Task task = checkUserAuth(taskId, user);
         // 不确定性更新后，任务状态只能为 1，状态为 todo
         task.setCurStage(1);
+        task.setConfig(task.getConfig() | 1);
         task.setCurStatus("todo");
         taskService.updateById(task);
 
@@ -98,10 +105,16 @@ public class TaskController {
                                                 HttpServletRequest request) {
         Long taskId = conditionCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
-        Task task = checkLoginAuth(taskId, user);
-        // 运行工况更新后，任务状态只能为 2，状态为 todo
-        task.setCurStage(2);
-        task.setCurStatus("todo");
+        Task task = checkUserAuth(taskId, user);
+        // 运行工况更新后，任务状态最大只能为 2，状态为 todo
+        task.setConfig(task.getConfig() | 2);
+        if (task.getCurStage() >= 2) {
+            launch.terminatePythonTask(taskId);
+            task.setCurStage(2);
+            task.setCurStatus("todo");
+        } else if (task.getCurStage() == 1 && "done".equals(task.getCurStatus())) {
+            task.setCurStage(2);
+        }
         taskService.updateById(task);
 
         Condition condition = new Condition();
@@ -125,10 +138,16 @@ public class TaskController {
                                                 HttpServletRequest request) {
         Long taskId = vulnerabilityCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
-        Task task = checkLoginAuth(taskId, user);
-        // 脆弱性更新后，任务状态只能为 3，状态为 todo
-        task.setCurStage(3);
-        task.setCurStatus("todo");
+        Task task = checkUserAuth(taskId, user);
+        // 脆弱性更新后，任务状态最大只能为 3，状态为 todo
+        task.setConfig(task.getConfig() | 4);
+        if (task.getCurStage() >= 3) {
+            launch.terminatePythonTask(taskId);
+            task.setCurStage(3);
+            task.setCurStatus("todo");
+        } else if (task.getCurStage() == 2 && "done".equals(task.getCurStatus())) {
+            task.setCurStage(3);
+        }
         taskService.updateById(task);
 
         Vulnerability vulnerability = new Vulnerability();
@@ -141,12 +160,84 @@ public class TaskController {
         return ResultUtils.success("success");
     }
 
-    // TODO 执行任务线程池
-    // TODO 任务执行状态更新
-    // TODO 任务执行结果保存
-    // TODO 任务执行结果下载
-    // TODO 任务执行取消
+    /**
+     * 下载任务结果
+     * @param taskIdStr 任务id
+     * @param taskStageStr 任务阶段
+     * @param request 请求
+     * @param response 响应
+     */
+    @GetMapping("/download")
+    public void downloadResult(@RequestParam("taskId") String taskIdStr, @RequestParam("TaskStage") String taskStageStr
+                                            , HttpServletRequest request, HttpServletResponse response) {
+        User user = userService.getLoginUser(request);
+        Long taskId = Long.parseLong(taskIdStr);
+        Integer taskStage = Integer.parseInt(taskStageStr);
+        Task task = checkUserAuth(taskId, user);
 
+        // 1.检查任务是否完成
+        if (task.getCurStage() < taskStage) {
+            log.info("任务 {} 未开始", taskId);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务未开始");
+        } else if (task.getCurStage().equals(taskStage) && !"done".equals(task.getCurStatus())) {
+            log.info("任务 {} 未完成", taskId);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务未完成");
+        }
+        // 2. 压缩文件夹并下载
+        FolderToZipUtil.zip(TaskUtils.getOutputDirByStage(taskId, taskStage), response);
+    }
+
+    /**
+     * 任务执行
+     * @param taskRunRequest 任务执行请求
+     * @param request 请求
+     * @return 是否执行成功
+     */
+    @PostMapping("/run")
+    public BaseResponse<String> runTask(@RequestBody TaskRunRequest taskRunRequest, HttpServletRequest request) {
+        Long taskId = taskRunRequest.getTaskId();
+        User user = userService.getLoginUser(request);
+        Task task = checkUserAuth(taskId, user);
+        Integer taskStage = taskRunRequest.getTaskStage();
+        // 1.检查任务是否完成
+        if (task.getCurStage() < taskStage - 1) {
+            log.info("任务 {} 阶段 {} 无法开始", taskId, taskStage);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务无法开始");
+        } else if (task.getCurStage().equals(taskStage - 1) && !"done".equals(task.getCurStatus())) {
+            log.info("任务 {} 阶段 {} 无法完成", taskId, taskStage);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务无法执行");
+        }
+        // 2. 配置文件是否到位
+        if (taskStage == 1 && (task.getConfig() & 1) == 0) {
+            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
+        } else if (taskStage == 2 && (task.getConfig() & 3) == 0) {
+            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
+        } else if (taskStage >= 3 && (task.getConfig() & 7) == 0) {
+            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
+        }
+        // 3.任务执行
+        launch.executePythonTask(taskId, taskStage);
+        return ResultUtils.success("任务执行中");
+    }
+
+    /**
+     * 取消任务
+     * @param cancelRequest 取消请求
+     * @param request 请求
+     * @return 是否取消成功
+     */
+    @PostMapping("/cancel")
+    public BaseResponse<String> cancelTask(@RequestBody TaskCancelRequest cancelRequest, HttpServletRequest request) {
+        Long taskId = cancelRequest.getTaskId();
+        User user = userService.getLoginUser(request);
+        Task task = checkUserAuth(taskId, user);
+        // 1.任务取消
+        launch.terminatePythonTask(taskId);
+        return ResultUtils.success("任务取消成功");
+    }
 
 
     /**
@@ -154,7 +245,7 @@ public class TaskController {
      * @param taskId 任务id
      * @param user  用户
      */
-    public Task checkLoginAuth(Long taskId, User user) {
+    public Task checkUserAuth(Long taskId, User user) {
         Task task = taskService.getById(taskId);
         if (task == null) {
             log.info("任务 {} 不存在", taskId);

@@ -2,24 +2,24 @@
 import numpy as np
 import os
 
-
-def Result_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_Opf, Path_Ops, Num_S):
+def Result_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_Sim, Path_Out, Num_S):
+    Path_opf = Path_Sim + '/Output_opf'
+    Path_ops = Path_Sim + '/Output_ops'
     #  Wind Speed for IDA (Hazard intensity)
     if Dict_Cnd['IMImpM'][0] == 1:  # Wind input method
         WindSpd = np.arange(Dict_Cnd['WindSpd'][0], Dict_Cnd['WindSpd'][1] + 1, Dict_Cnd['WindSpd'][2])
     elif Dict_Cnd['IMImpM'][0] == 2:
         WindSpd = np.loadtxt(Dict_Cnd['WindSpd'][0], dtype=np.float)
 
-    Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_Opf, WindSpd, Num_S)
+    Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, Path_Out, WindSpd, Num_S)
     if Dict_Cnd['IM_Model'][0].upper() != 'None'.upper():
-        Ops_Amp(Dict_Cnd, Dict_Vln, Path_Ops, WindSpd, Num_S)
+        Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, Path_Out, WindSpd, Num_S)
 
     if Dict_Vln['Frgl_Op'][0] == 2:
-        Ops_Amp(Dict_Cnd, Dict_Vln, Path_Ops, WindSpd, Num_S)
+        Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, Path_Out, WindSpd, Num_S)
 
 
-
-def Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, WindSpd, Num_S):
+def Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, Path_Out, WindSpd, Num_S):
     Out_Opf = ['OoPDefl1', 'IPDefl1', 'YawBrTAxp', 'YawBrTAyp', 'TwrTpTDxi', 'TwrTpTDyi', 'PtfmSurge', 'PtfmSway',
                'TwrBsFxt', 'TwrBsFyt', 'TwrBsFzt', 'TwrBsMxt', 'TwrBsMyt', 'TwrBsMzt',
                '-ReactFXss', '-ReactFYss', '-ReactFZss', '-ReactMXss', '-ReactMYss', '-ReactMZss']
@@ -38,13 +38,11 @@ def Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, WindSpd, Num_S):
                'PltfDX', 'PltfDY', 'PltfDC', 'TwrBsSX', 'TwrBsSY', 'TwrBsSC', 'SubBsSX', 'SubBsSY', 'SubBsSC', 'TowerStrike']
     Temp_Amp = np.zeros(len(Out_Amp))
     Dict_Amp = {}
+    Dict_Amp['WindSpd'] = WindSpd
 
     #%% IDA result for each model
     for ii in range(Num_S):
-        #  Make directory
-        Path_Amp = Path_opf + '/Model_{}'.format(ii+1) + '/Amp'
-        if not os.path.isdir(Path_Amp):
-            os.mkdir(Path_Amp)
+
         #  Structural property of each model
         Twr_D = Dict_Sap['TwrBD'][ii]
         Twr_t = Dict_Sap['TwrBT'][ii]
@@ -59,7 +57,6 @@ def Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, WindSpd, Num_S):
         if Dict_Cnd['AnaTy'][0] == 1:  # Analyze Type -- IDA
             for key in Out_Amp:
                 Dict_Amp[key] = np.zeros([len(WindSpd), Dict_Cnd['NumF'][0]])
-            np.savetxt(Path_Amp + '/WindSpd.txt', WindSpd, delimiter=' ')
 
             for jj in range(len(WindSpd)):  # for each wind speed
                 Path_Data = Path_opf + '/Model_{}'.format(ii + 1) + '/{}mps'.format(WindSpd[jj])
@@ -84,12 +81,18 @@ def Opf_Amp(Dict_Sap, Dict_Cnd, Dict_Vln, Path_opf, WindSpd, Num_S):
                     Dict_Amp[Out_Amp[i]][kk] = Amp[i]
 
         # Save IDA result
+        if not os.path.exists(Path_Out):
+            os.makedirs(Path_Out)
+        Folder = Path_Out + '/Output_opf'
+        if not os.path.exists(Folder):
+            os.makedirs(Folder)
+        Folder = Path_Out + '/Output_opf/Model_{}'.format(ii + 1)
+        if not os.path.isdir(Folder):
+            os.mkdir(Folder)
         for key, value in Dict_Amp.items():
-            np.savetxt(Path_Amp + '/{}.txt'.format(key), value, delimiter=' ')
+            np.savetxt(Folder + '/{}.txt'.format(key), value, delimiter=' ')
 
-
-
-def Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, WindSpd, Num_S):
+def Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, Path_Out, WindSpd, Num_S):
     # Analysis type of OpenSees
     if Dict_Cnd['IM_Model'][0].upper() == 'None'.upper():
         os._exit(0)
@@ -102,18 +105,14 @@ def Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, WindSpd, Num_S):
                'TwrBsSY', 'TwrBsSC', 'SubBsSX', 'SubBsSY', 'SubBsSC']
     Temp_Amp = np.zeros(len(Out_Amp))
     Dict_Amp = {}
+    Dict_Amp['WindSpd'] = WindSpd
 
     for ii in range(len(Ops_M)):
-        #  Make directory
-        Path_Amp = Path_ops + '/Model_{}'.format(Ops_M[ii]) + '/Amp'
-        if not os.path.isdir(Path_Amp):
-            os.mkdir(Path_Amp)
 
         if Dict_Cnd['AnaTy'][0] == 1:  # Analyze Type -- IDA
             WindSpd = WindSpd[Dict_Cnd['IM_Nth'][0]-1:]
             for key in Out_Amp:
                 Dict_Amp[key] = np.zeros([len(WindSpd), Dict_Cnd['NumF'][0]])
-            np.savetxt(Path_Amp + '/WindSpd.txt', WindSpd, delimiter=' ')
 
             for jj in range(len(WindSpd)):  # for each wind speed
                 Path_Data = Path_ops + '/Model_{}'.format(Ops_M[ii]) + '/{}mps'.format(WindSpd[jj])
@@ -136,11 +135,16 @@ def Ops_Amp(Dict_Cnd, Dict_Vln, Path_ops, WindSpd, Num_S):
                     Dict_Amp[Out_Amp[i]][kk] = Amp[i]
 
         # Save IDA result
+        if not os.path.exists(Path_Out):
+            os.makedirs(Path_Out)
+        Folder = Path_Out + '/Output_opf'
+        if not os.path.exists(Folder):
+            os.makedirs(Folder)
+        Folder = Path_Out + '/Output_opf/Model_{}'.format(ii + 1)
+        if not os.path.isdir(Folder):
+            os.mkdir(Folder)
         for key, value in Dict_Amp.items():
-            np.savetxt(Path_Amp + '/{}.txt'.format(key), value, delimiter=' ')
-
-
-
+            np.savetxt(Folder + '/{}.txt'.format(key), value, delimiter=' ')
 
 def Data_Amp_Opf(Path_Data, num, IniTI, Col_Opf, Temp_Amp, Twr_D, Twr_t, Twr_A, Twr_W, Sub_D, Sub_t, Sub_A, Sub_W):
     # Tower strike

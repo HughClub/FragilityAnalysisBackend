@@ -44,6 +44,13 @@ public class Task implements Serializable {
     private String curStatus;
 
     /**
+     * 配置文件
+     */
+    @TableField(value = "config")
+    private Integer config;
+
+
+    /**
      * 创建时间
      */
     @TableField(value = "createTime")

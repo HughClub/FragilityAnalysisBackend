@@ -14,4 +14,12 @@ public class TaskUtils {
     public static String getOutputDir(Long taskId) {
         return "D:/upload/" + taskId + "/output";
     }
+
+    public static String getOutputDirByStage(Long taskId, Integer taskStage) {
+        return "D:/upload/" + taskId + "/output/Step_" + taskStage;
+    }
+
+    public static String getPythonScript() {
+        return "D:\\Main\\WorkSpace\\java\\ideaprojects\\springboot-init\\py\\Codes\\Main.py";
+    }
 }

@@ -7,8 +7,11 @@ import Opf_FM
 from BModes import BModes
 
 
-def OpfRun(Path_Out, Path_FAST, Dict_Sap, Dict_Cnd, Num_S):
+def OpfRun(Path_Out_Step_2, Path_FAST, Dict_Sap, Dict_Cnd, Num_S):
     # %%  make directories
+    if not os.path.isdir(Path_Out_Step_2):
+        os.mkdir(Path_Out_Step_2)
+    Path_Out = Path_Out_Step_2 + '/Output_opf'
     if not os.path.isdir(Path_Out):
         os.mkdir(Path_Out)
     Path_Temp = Path_Out + '/Temp'
@@ -112,10 +115,12 @@ def OpfRun(Path_Out, Path_FAST, Dict_Sap, Dict_Cnd, Num_S):
                 if not os.path.isdir(Path_Temp):
                     os.mkdir(Path_Temp)
                 OpfVar['TS']['URef'] = WindSpd[jj]
-                OpfVar['HD']['WaveHs'] = WaveHs[jj]
-                OpfVar['HD']['WaveTp'] = WaveTp[jj]
+                OpfVar['HD']['WaveHs'] = np.float32(WaveHs[jj])
+                OpfVar['HD']['WaveTp'] = np.float32(WaveTp[jj])
 
-                for kk in range(int(Dict_Cnd['NumF'][0])):  # Variables related to random seeds
+                Num_Sim = Dict_Cnd['NumF'][0]
+
+                for kk in range(int(Num_Sim)):  # Variables related to random seeds
                     RandSeeds = np.random.randint(-2147483648, 2147483647, 4)
                     OpfVar['TS']['RandSeed1'] = RandSeeds[0]
                     OpfVar['TS']['RandSeed2'] = RandSeeds[1]
@@ -143,7 +148,7 @@ def OpfRun(Path_Out, Path_FAST, Dict_Sap, Dict_Cnd, Num_S):
             OpfVar['HD']['WaveHs'] = Dict_Sap['WaveHs']
             OpfVar['HD']['WaveTp'] = Dict_Sap['WaveTp']
 
-            for kk in range(int(Dict_Cnd['NumF'][0])):  # Variables related to random seeds
+            for kk in range(np.int(Dict_Cnd['NumF'][0])):  # Variables related to random seeds
                 RandSeeds = np.random.randint(-2147483648, 2147483647, 4)
                 OpfVar['TS']['RandSeed1'] = RandSeeds[0]
                 OpfVar['TS']['RandSeed2'] = RandSeeds[1]

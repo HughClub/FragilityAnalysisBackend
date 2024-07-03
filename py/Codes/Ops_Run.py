@@ -4,7 +4,13 @@ import os
 from Ops_Inp import Ops_input
 from Ops_Mdl import OpenSees_Model
 
-def OpsRun(Path_Out, Path_OpfOut, Dict_Sap, Dict_Cnd, Num_S):
+def OpsRun(Path_Out_Step_2, Dict_Sap, Dict_Cnd, Num_S):
+    if not os.path.isdir(Path_Out_Step_2):
+        os.mkdir(Path_Out_Step_2)
+    Path_Out = Path_Out_Step_2 + '/Output_ops'
+    if not os.path.isdir(Path_Out):
+        os.mkdir(Path_Out)
+    Path_opf = Path_Out_Step_2 + '/Output_opf'
     #%% Analysis type of OpenSees
     if Dict_Cnd['IM_Model'][0].upper() == 'None'.upper():
         os._exit(0)
@@ -46,11 +52,11 @@ def OpsRun(Path_Out, Path_OpfOut, Dict_Sap, Dict_Cnd, Num_S):
                     os.mkdir(Path_Wind)
 
                 for kk in range(Dict_Cnd['NumF'][0]):
-                    Path_Load = Path_OpfOut + '/Model_' + str(Ops_M[ii]) + '/{}mps'.format(WindSpd[jj])
+                    Path_Load = Path_opf + '/Model_' + str(Ops_M[ii]) + '/{}mps'.format(WindSpd[jj])
                     OpenSees_Model(Path_Load, Path_File, Path_Wind, ksi, dT, MatStren, MatMod, kk + 1)
 
         if Dict_Cnd['AnaTy'][0] == 2:
             for kk in range(Dict_Cnd['NumF'][0]):
-                Path_Load = Path_OpfOut + '/Model_' + str(Ops_M[ii]) + '/{}_data.txt'.format(kk + 1)
+                Path_Load = Path_opf + '/Model_' + str(Ops_M[ii]) + '/{}_data.txt'.format(kk + 1)
                 OpenSees_Model(Path_Load, Path_File, Path_Model, ksi, dT, MatStren, MatMod, kk + 1)
 

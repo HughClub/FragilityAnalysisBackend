@@ -1,29 +1,23 @@
 package com.xy.springboot.model.dto.task;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
 /**
- * 任务查询请求
+ * @author sc-xy
+ * @time 2024/7/3
  */
 @Data
-public class TaskQueryRequest implements Serializable {
-
+public class TaskRunRequest implements Serializable {
     /**
      * 任务id
      */
     private Long taskId;
-
     /**
-     * 任务状态
+     * 任务阶段
      */
-    private String curStatus;
-    /**
-     * 任务名称
-     */
-    private String taskName;
+    private Integer taskStage;
 
     private static final long serialVersionUID = 1L;
 }

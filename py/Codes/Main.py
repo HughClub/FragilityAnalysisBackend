@@ -3,8 +3,8 @@
 Path_FAST = 'D:\Main\WorkSpace\java\ideaprojects\springboot-init\py\OpenFAST'  # OpenFAST文件夹所在位置，这个应该是在服务器的固定位置
 
 ## ---------------------------------------------##
-Path_Inp = 'D:/Research/3-Fragility_extreme_condiitons/Software/Input'  # 输入文件所在位置
-Path_Out = 'D:/Research/3-Fragility_extreme_condiitons/Software/Output'  # 输出文件夹所在位置
+Path_Inp = 'D:/Main/WorkSpace/java/ideaprojects/springboot-init/py/Input'  # 输入文件所在位置
+Path_Out = 'D:/Main/WorkSpace/java/ideaprojects/springboot-init/py/Output'  # 输出文件夹所在位置
 ## ---------------------------------------------##
 
 ## Step-1

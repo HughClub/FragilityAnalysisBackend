@@ -20,7 +20,7 @@ def BModes(Path_FAST, Path_Out, Dict_Sap, Num_S):
         subprocess.run([(Path_FAST+'/BModes_Alpha.exe'), File_Inp])
 
         # Get coefficients for modes
-        File_out = (Path_Temp+'/BModes_Inp.out')
+        File_out = (Path_Temp+'\\BModes_Inp.out')
         Coefs = GetShapeCoefs(File_out, FE_loc)
 
         # Save coefficients for ElastoDyn input

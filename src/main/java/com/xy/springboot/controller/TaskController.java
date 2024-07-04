@@ -14,6 +14,7 @@ import com.xy.springboot.model.dto.task.config.VulnerabilityCreateOrUpdateReques
 import com.xy.springboot.model.entity.*;
 import com.xy.springboot.model.vo.TaskVO;
 import com.xy.springboot.service.*;
+import com.xy.springboot.utils.ConfigUtils;
 import com.xy.springboot.utils.FolderToZipUtil;
 import com.xy.springboot.utils.TaskUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -73,7 +75,7 @@ public class TaskController {
      */
     @PostMapping("/config/Uncertainty")
     public BaseResponse<String> configUncertainty(@RequestBody UncertaintyCreateOrUpdateRequest uncertaintyCreateOrUpdateRequest,
-                                                  HttpServletRequest request) {
+                                                  HttpServletRequest request) throws IOException {
         Long taskId = uncertaintyCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
         Task task = checkUserAuth(taskId, user);
@@ -85,6 +87,8 @@ public class TaskController {
 
         Uncertainty uncertainty = new Uncertainty();
         BeanUtils.copyProperties(uncertaintyCreateOrUpdateRequest, uncertainty);
+
+        ConfigUtils.generateUncertaintyFile(taskId, uncertainty);
 
         int changeNum = uncertaintyService.createOrUpdateUncertainty(uncertainty);
         if (changeNum == 0) {
@@ -102,7 +106,7 @@ public class TaskController {
      */
     @PostMapping("/config/Condition")
     public BaseResponse<String> configCondition(@RequestBody ConditionCreateOrUpdateRequest conditionCreateOrUpdateRequest,
-                                                HttpServletRequest request) {
+                                                HttpServletRequest request) throws IOException {
         Long taskId = conditionCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
         Task task = checkUserAuth(taskId, user);
@@ -119,6 +123,9 @@ public class TaskController {
 
         Condition condition = new Condition();
         BeanUtils.copyProperties(conditionCreateOrUpdateRequest, condition);
+
+        ConfigUtils.generateConditionFile(taskId, condition);
+
         int changeNum = conditionService.createOrUpdateCondition(condition);
         if (changeNum == 0) {
             log.info("运行工况配置更新失败");
@@ -135,7 +142,7 @@ public class TaskController {
      */
     @PostMapping("/config/Vulnerability")
     public BaseResponse<String> configVulnerability(@RequestBody VulnerabilityCreateOrUpdateRequest vulnerabilityCreateOrUpdateRequest,
-                                                HttpServletRequest request) {
+                                                HttpServletRequest request) throws IOException {
         Long taskId = vulnerabilityCreateOrUpdateRequest.getTaskId();
         User user = userService.getLoginUser(request);
         Task task = checkUserAuth(taskId, user);
@@ -152,6 +159,9 @@ public class TaskController {
 
         Vulnerability vulnerability = new Vulnerability();
         BeanUtils.copyProperties(vulnerabilityCreateOrUpdateRequest, vulnerability);
+
+        ConfigUtils.generateVulnerabilityFile(taskId, vulnerability);
+
         int changeNum = vulnerabilityService.createOrUpdateVulnerability(vulnerability);
         if (changeNum == 0) {
             log.info("脆弱性配置更新失败");
@@ -208,13 +218,13 @@ public class TaskController {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务无法执行");
         }
         // 2. 配置文件是否到位
-        if (taskStage == 1 && (task.getConfig() & 1) == 0) {
+        if (taskStage == 1 && (task.getConfig() & 1) != 1) {
             log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
-        } else if (taskStage == 2 && (task.getConfig() & 3) == 0) {
+        } else if (taskStage == 2 && (task.getConfig() & 3) != 3) {
             log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
-        } else if (taskStage >= 3 && (task.getConfig() & 7) == 0) {
+        } else if (taskStage >= 3 && (task.getConfig() & 7) != 7) {
             log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
         }

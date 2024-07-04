@@ -229,6 +229,9 @@ public class TaskController {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
         }
         // 3.任务执行
+        task.setCurStage(taskStage);
+        task.setCurStatus("running");
+        taskService.updateById(task);
         launch.executePythonTask(taskId, taskStage);
         return ResultUtils.success("任务执行中");
     }

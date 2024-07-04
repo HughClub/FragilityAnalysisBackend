@@ -47,7 +47,6 @@ public class AppLaunch implements Launch {
                         "--Path_Out", TaskUtils.getOutputDir(taskId));
                 log.info("python " + TaskUtils.getPythonScript() + " --Path_Inp " + TaskUtils.getInputDir(taskId) + " --Task_Stage Step_" + taskId + " --Path_Out " + TaskUtils.getOutputDir(taskId));
                 log.info("Task {} started {} stage", taskId, taskStage);
-                taskService.taskUpdate(taskId, "running");
                 process = processBuilder.start();
                 processMap.put(taskId, process);
 

@@ -12,7 +12,7 @@ import lombok.Data;
  * Condition参数配置
  * @TableName condition
  */
-@TableName(value ="condition")
+@TableName(value ="`condition`")
 @Data
 public class Condition implements Serializable {
     /**

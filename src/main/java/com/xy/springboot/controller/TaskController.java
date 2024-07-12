@@ -9,6 +9,7 @@ import com.xy.springboot.common.ResultUtils;
 import com.xy.springboot.exception.BusinessException;
 import com.xy.springboot.model.dto.task.*;
 import com.xy.springboot.model.dto.task.config.ConditionCreateOrUpdateRequest;
+import com.xy.springboot.model.dto.task.config.ConfigQueryRequest;
 import com.xy.springboot.model.dto.task.config.UncertaintyCreateOrUpdateRequest;
 import com.xy.springboot.model.dto.task.config.VulnerabilityCreateOrUpdateRequest;
 import com.xy.springboot.model.entity.*;
@@ -234,6 +235,28 @@ public class TaskController {
         taskService.updateById(task);
         launch.executePythonTask(taskId, taskStage);
         return ResultUtils.success("任务执行中");
+    }
+
+    @PostMapping("/queryConfig")
+    public <T> BaseResponse<T> queryConfig(@RequestBody ConfigQueryRequest queryRequest, HttpServletRequest request) {
+        Long taskId = queryRequest.getTaskId();
+        User user = userService.getLoginUser(request);
+        Task task = checkUserAuth(taskId, user);
+
+        String configType = queryRequest.getConfigType();
+        if ("Uncertainty".equals(configType)) {
+            Uncertainty uncertainty = uncertaintyService.getUncertaintyByTaskId(taskId);
+            return ResultUtils.success((T) uncertainty);
+        } else if ("Condition".equals(configType)) {
+            Condition condition = conditionService.getConditionByTaskId(taskId);
+            return ResultUtils.success((T) condition);
+        } else if ("Vulnerability".equals(configType)) {
+            Vulnerability vulnerability = vulnerabilityService.getVulnerabilityByTaskId(taskId);
+            return ResultUtils.success((T) vulnerability);
+        } else {
+            log.info("任务 {} 配置类型 {} 不存在", taskId, configType);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置类型不存在");
+        }
     }
 
     /**

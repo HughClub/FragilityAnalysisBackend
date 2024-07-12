@@ -30,6 +30,13 @@ public class ConditionServiceImpl extends ServiceImpl<ConditionMapper, Condition
         }
 
     }
+
+    @Override
+    public Condition getConditionByTaskId(Long taskId){
+        QueryWrapper<Condition> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("taskId", taskId);
+        return this.getOne(queryWrapper);
+    }
 }
 
 

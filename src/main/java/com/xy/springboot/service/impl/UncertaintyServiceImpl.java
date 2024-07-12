@@ -29,6 +29,13 @@ public class UncertaintyServiceImpl extends ServiceImpl<UncertaintyMapper, Uncer
             return this.baseMapper.updateById(uncertainty);
         }
     }
+
+    @Override
+    public Uncertainty getUncertaintyByTaskId(Long taskId) {
+        QueryWrapper<Uncertainty> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("taskId", taskId);
+        return this.getOne(queryWrapper);
+    }
 }
 
 

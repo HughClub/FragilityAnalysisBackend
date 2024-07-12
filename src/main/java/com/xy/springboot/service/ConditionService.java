@@ -16,4 +16,6 @@ public interface ConditionService extends IService<Condition> {
      * @return Condition
      */
     int createOrUpdateCondition(Condition condition);
+
+    Condition getConditionByTaskId(Long taskId);
 }

@@ -15,4 +15,6 @@ public interface UncertaintyService extends IService<Uncertainty> {
      * @return 插入或更新结果
      */
     int createOrUpdateUncertainty(Uncertainty uncertainty);
+
+    Uncertainty getUncertaintyByTaskId(Long taskId);
 }

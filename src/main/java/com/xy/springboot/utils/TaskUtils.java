@@ -20,6 +20,6 @@ public class TaskUtils {
     }
 
     public static String getPythonScript() {
-        return "D:\\Main\\WorkSpace\\java\\ideaprojects\\springboot-init\\py\\Codes\\Main.py";
+        return "D:\\Fragility_tool\\Software\\Codes\\Main.py";
     }
 }

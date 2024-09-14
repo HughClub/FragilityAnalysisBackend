@@ -201,8 +201,8 @@ def IDA_Set(Dict_Cnd):
     #  Wave parameters for IDA
     if Dict_Cnd['WPInpM'][0] == 1:  # Wave input method
         WaveMod = 0
-        WaveHs = np.zeros([len(WindSpd), 1])
-        WaveTp = np.zeros([len(WindSpd), 1])
+        WaveHs = np.ones([len(WindSpd),])
+        WaveTp = np.ones([len(WindSpd),])
     elif Dict_Cnd['WPInpM'][0] == 2:
         WaveMod = 2
         WaveHs = 0.0002491*WindSpd**3-0.009742*WindSpd**2+0.3361*WindSpd-1.092+0.17
@@ -211,7 +211,7 @@ def IDA_Set(Dict_Cnd):
         WaveMod = 2
         WaveHs = np.loadtxt(Dict_Cnd['WaveHsF'][0], dtype=np.float)
         WaveTp = np.loadtxt(Dict_Cnd['WaveTpF'][0], dtype=np.float)
-    return WindSpd, WaveMod, WaveHs, WaveTp
+    return np.int32(WindSpd), WaveMod, WaveHs, WaveTp
 
 
 def Operational_Cnd(Dict_Cnd):
@@ -303,10 +303,3 @@ def RunFAST(num, Path_FAST, Path_out):
     os.remove(Path_out + '/Temp/InflowWind_{}.dat'.format(num))
     os.remove(Path_out + '/Temp/HydroDyn_{}.dat'.format(num))
     os.remove(Path_out + '/Temp/Main_{}.fst'.format(num))
-
-
-
-
-
-
-

@@ -39,6 +39,7 @@ class ResultCode(Enum):
     STEP_INVALID = 400
     TASK_INVALID = 401
     TASK_BURST = 402
+    CONFIG_ASSERT = 403
     DRY_RUN = 201
     HELLO = 202
 
@@ -51,6 +52,7 @@ MESSAGE = {
     ResultCode.STEP_INVALID: "Invalid step",
     ResultCode.TASK_INVALID: "Invalid task",
     ResultCode.TASK_BURST: "Runtime error while processing",
+    ResultCode.CONFIG_ASSERT: "Current configuration is invalid",
     ResultCode.DRY_RUN: "Dry run success",
     ResultCode.HELLO: "Welcome to Fragility Analysis Internal API",
 }
@@ -80,6 +82,9 @@ def core_process(task_id: int, step_id: int):
         return check_result.result()
     try:
         core_run_step(task_id, step_id)
+    except AssertionError as e:
+        traceback.print_exc()
+        return ResultCode.CONFIG_ASSERT.result()
     except Exception as e:
         # print error with trace
         traceback.print_exc()

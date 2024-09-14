@@ -219,15 +219,15 @@ public class TaskController {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务无法执行");
         }
         // 2. 配置文件是否到位
-        if (taskStage == 1 && (task.getConfig() & 1) != 1) {
-            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
-        } else if (taskStage == 2 && (task.getConfig() & 3) != 3) {
-            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
-        } else if (taskStage >= 3 && (task.getConfig() & 7) != 7) {
-            log.info("任务 {} 阶段 {} 配置文件不完整", taskId, taskStage);
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "配置文件不完整");
+        switch (taskStage) {
+            case 1:
+                if ((task.getConfig() & 1) == 1) break;
+            case 2:
+                if ((task.getConfig() & 3) == 3) break;
+            default:
+                if ((task.getConfig() & 7) == 7) break;
+                log.info("Task {} Stage {} is not fully configured", taskId, taskStage);
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务配置不全");
         }
         // 3.任务执行
         task.setCurStage(taskStage);

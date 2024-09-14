@@ -5,6 +5,7 @@ import com.xy.springboot.config.FastConfig;
 import com.xy.springboot.service.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -37,13 +38,25 @@ public class AppLaunch implements Launch {
     @Override
     public void executePythonTask(Long taskId, Integer taskStage) {
         Future<String> future = threadPoolExecutor.submit(() -> {
-            // GET http://localhost:{port}}/step/{taskId}/{taskStage}22
+            // GET http://localhost:{port}}/step/{taskId}/{taskStage}
             RestTemplate restTemplate = new RestTemplate();
             String url = FastConfig.getTaskUrl(taskId, taskStage);
-            log.info("api call: {}", url);
-            FastResponse response = restTemplate.getForObject(url, FastResponse.class);
-            log.info("api response: {}", response);
-            return response != null ? response.toString() : "no response";
+            String result = null;
+            log.warn("api call: {}", url);
+            try {
+                FastResponse response = restTemplate.getForObject(url, FastResponse.class);
+                log.warn("api response: {}", response);
+                result = response != null ? response.toString() : "no response";
+                taskService.taskUpdate(taskId, "done");
+
+            } catch (Exception e) {
+                log.error("Task {} stage {} failed to run", taskId, taskStage, e);
+                taskService.taskUpdate(taskId, "failed");
+                throw new RuntimeException(e);
+            } finally {
+                futureMap.remove(taskId);
+            }
+            return result;
 
             // region old code with process launch
 //            Process process = null;

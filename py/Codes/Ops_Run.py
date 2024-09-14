@@ -17,6 +17,7 @@ def OpsRun(Path_Out_Step_2, Dict_Sap, Dict_Cnd, Num_S):
     elif Dict_Cnd['IM_Model'][0].upper() == 'All'.upper():
         Ops_M = np.arange(1, Num_S+1)
     else:
+        assert max(Dict_Cnd['IM_Model']) <= Num_S, 'IM_Model does not match the number of samples'
         Ops_M = np.array(Dict_Cnd['IM_Model'])
 
     #%% Generate input file for opensees

@@ -173,19 +173,25 @@ public class TaskController {
 
     /**
      * 下载任务结果
-     * @param taskIdStr 任务id
-     * @param taskStageStr 任务阶段
+     * @param taskIdStr 任务id parse to Long
+     * @param taskStageStr 任务阶段 parse to Integer
      * @param request 请求
      * @param response 响应
      */
     @GetMapping("/download")
-    public void downloadResult(@RequestParam("taskId") String taskIdStr, @RequestParam("TaskStage") String taskStageStr
-                                            , HttpServletRequest request, HttpServletResponse response) {
+    public void downloadResult(@RequestParam("taskId") String taskIdStr, @RequestParam("TaskStage") String taskStageStr,
+                               @RequestParam(name="useZip", defaultValue = "false") String useZipStr,
+                               HttpServletRequest request, HttpServletResponse response) {
         User user = userService.getLoginUser(request);
         Long taskId = Long.parseLong(taskIdStr);
         Integer taskStage = Integer.parseInt(taskStageStr);
+        Boolean useZip = Boolean.parseBoolean(useZipStr);
         Task task = checkUserAuth(taskId, user);
 
+        if (taskStage == -1) { // download all ignore taskStage
+            FolderToZipUtil.zip(TaskUtils.getOutputDir(taskId), useZip, response);
+            return;
+        }
         // 1.检查任务是否完成
         if (task.getCurStage() < taskStage) {
             log.info("任务 {} 未开始", taskId);
@@ -195,7 +201,7 @@ public class TaskController {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "任务未完成");
         }
         // 2. 压缩文件夹并下载
-        FolderToZipUtil.zip(TaskUtils.getOutputDirByStage(taskId, taskStage), response);
+        FolderToZipUtil.zip(TaskUtils.getOutputDirByStage(taskId, taskStage), useZip, response);
     }
 
     /**
